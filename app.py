@@ -6,7 +6,7 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Đường dẫn ảnh nền bạn gửi (nằm trong cùng thư mục)
-BASE_IMAGE_URL = "https://iili.io/3igtA1s.jpg"
+BASE_IMAGE_PATH = "https://iili.io/3igtA1s.jpg"
 
 # Danh sách API key
 API_KEYS = {
@@ -20,22 +20,22 @@ def is_key_valid(api_key):
     return API_KEYS.get(api_key, False)
 
 def fetch_data(region, uid):
-    """Lấy dữ liệu người chơi từ API ngoài"""
+    """Fetch player info data from external API."""
     url = f"https://ffwlxd-info.vercel.app/player-info?region={region}&uid={uid}"
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        print(f"Lỗi khi lấy dữ liệu: {e}")
+        print(f"Error fetching data: {e}")
         return None
 
-def overlay_images(base_image_path, item_ids):
-    """Overlay các ảnh item lên ảnh nền"""
+def overlay_images(base_image_url, item_ids):
+    """Overlay item images on top of base image."""
     try:
-        base = Image.open(base_image_path).convert("RGBA")
+        base = Image.open(BytesIO(requests.get(base_image_url).content)).convert("RGBA")
     except Exception as e:
-        print(f"Lỗi khi mở ảnh nền: {e}")
+        print(f"Error loading base image: {e}")
         return None
 
     # Vị trí tương ứng 6 ô lục giác trong ảnh bạn gửi
